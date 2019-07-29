@@ -1,0 +1,4 @@
+# Skip Map History
+
+## 1.0.0 (8/27/2015)
+* Initial release

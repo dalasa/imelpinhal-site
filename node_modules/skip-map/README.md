@@ -1,0 +1,63 @@
+# Skip Map
+[![npm](https://img.shields.io/npm/v/skip-map.svg?style=flat-square)](https://www.npmjs.com/package/skip-map) [![npm](https://img.shields.io/npm/dm/skip-map.svg?style=flat-square)](https://www.npmjs.com/package/skip-map) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://raw.githubusercontent.com/KyleRoss/express-skip-map/master/LICENSE)
+
+Most developer tools built into browsers will automatically request a sourcemap file for `.js` and `.css` files that have been minified. In order prevent 404 errors showing in your express application constantly for missing `.map` files, use this middleware to skip HTTP requests for `.map` files. Don't use this module if you actually have sourcemap files for your minified files. Adding this to our applications was much easier than constantly reminding developers to turn off sourcemaps in their developer tools.
+
+## Install
+Using npm:
+
+    npm install skip-map --save
+
+## Usage
+Skip Map middleware **must** be called before any `static` middleware.
+
+    var express = require('express'),
+        skipMap = require('skip-map'),
+        app = express();
+    
+    app.use(skipMap());
+    
+    app.use(express.static('./public'));
+    
+    app.listen(3000, function() {
+        console.log('Server is listening on port 3000');
+    });
+ 
+### skipMap([callback])
+Returns the skip map middleware function for Express. Takes an optional `callback` to define how requests for `.map` files should be handled. When a callback function is not provided, it will just end the request by calling `res.send('')`.
+
+| Required? | Argument    | Type       | Description
+| --------- | ----------- | ---------- | --------------------------------
+| No        | callback    | Function   | A callback function to define how to handle requests for `.map` files. Function is called with `req`, `res` and `next`.
+
+Example:
+
+    // Without a callback function
+    app.use(skipMap());
+    
+    // With a callback function
+    app.use(skipMap(function(req, res, next) {
+        console.log('Skipping request for a .map file');
+        res.send('');
+    }));
+    
+    // Skip only in Development
+    app.use(skipMap(function(req, res, next) {
+        if(process.env.NODE_ENV === 'development') {
+            console.log('Skipping request for a .map file');
+            res.send('');
+        } else {
+            next(); // will try to load the .map file if exists
+        }
+    }));
+
+---
+
+## Issues
+Found a bug? Have an enhancement? Create a new issue. I will try to get it fixed as soon as possible.
+
+## Contributing
+Want to contribute to the project? Fork and submit a pull request.
+
+## License
+Licensed under the MIT license. See LICENSE in the repository for more information.
